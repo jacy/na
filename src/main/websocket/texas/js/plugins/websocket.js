@@ -6,7 +6,7 @@
     },
 
     defaults: {
-      host: "173.255.240.250",
+      host: "192.168.1.10",
       port: "8002",
       onmessage: function(e) {
         console.log(['websocket message', e]);
