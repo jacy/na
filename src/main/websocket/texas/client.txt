@@ -1,0 +1,48 @@
+1. prototype.js
+  var commands = new Object(); // commands.LOGIN = {cmd='LOGIN',write:function(data)}
+  var commands_by_id = new Object(); // commands_by_id.1 = commands.LOGIN;
+  var notifys = new Object(); //notifys.NOTIFY_31= {notify='LOGIN', read:function(data), read_string:function, read_wstring:function}
+  var events = new Object(); // events.LOGIN = [function(){}], notify events onMessage receive
+
+	generate_cmd(cmd, status) {  // cmd='LOGIN'; status= [1, {type: "string", prop: "usr"},{type: "string", prop: "pass"}])
+	    var obj = {
+	      cmd: cmd,
+	      write: function(data) { //return data according to type}
+	    }
+	    commands[cmd] = obj;
+	    commands_by_id[status[0]] = obj;
+	}
+
+
+	generate_notify(notify, status) { //notify="LOGIN", status=[31, {type: "integer", prop: "id"}])
+		var obj = {
+     		  notify: notify,
+      		  read: function(bin) {
+       		    var obj = new Object();
+        	    obj["notify"] = notify;
+		    obj[status.prop] = parseData;
+		}
+		notifys["NOTIFY_" + status[0]] = obj;
+	}
+	
+	$.pp = {
+    	    read: function(bin) { return notifys["NOTIFY_" + bin[0]].read(bin) },
+	    write: function(data) {return commands[data.cmd].write(data) },
+	    reg: function(notify, fun) {
+	      events[notify] ? events[notify].push(fun) : events[notify] = [fun];
+	    },
+
+	    onmessage: function(evt) {
+	      var bin = $.base64.decode(evt.data);
+	      var obj = $.pp.read(bin);
+
+	      if (obj != null) {
+		if (obj.notify in events)
+		  $.each(events[obj.notify], function(i, fun) { fun(obj); } );
+		else
+		  console.log(['undefined event', obj.notify, obj]);
+	      } else {
+		console.log(evt);
+	      }
+	    }
+	}
