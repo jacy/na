@@ -7,7 +7,9 @@
   $.pp = {
     read: function(bin) {
       var obj = notifys["NOTIFY_" + bin[0]];
-      return obj ? obj.read(bin) : null;
+      var data = obj ? obj.read(bin) : null;
+      console.log(data);
+      return data;
     },
 
     write: function(data) {
@@ -83,7 +85,7 @@
     notify_player_info: generate_notify("PLAYER_INFO", [19, 
       {type: "integer", prop: "pid"}, 
       {type: "integer", prop: "inplay"}, 
-      {type: "string",  prop: "nick", base64: true},
+      {type: "string",  prop: "nick", base64: false},
       {type: "image",   prop: "photo"}]),
     notify_player_info: generate_notify("BALANCE_INFO", [33,
       {type: "decimal", prop: "amount"}, 
