@@ -4,30 +4,18 @@
   var notifys = new Object();
   var events = new Object();
 
-
   $.pp = {
-    // {{{ protocol function
     read: function(bin) {
       var obj = notifys["NOTIFY_" + bin[0]];
-
-      if ((obj == null) && (obj == undefined))
-        return null;
-
-      var data = obj.read(bin);
-      return data;
+      return obj ? obj.read(bin) : null;
     },
 
     write: function(data) {
-      var obj = commands[data.cmd];
-      var bin = obj.write(data);
-      return bin;
+      return commands[data.cmd].write(data);
     },
 
     reg: function(notify, fun) {
-      if (events[notify])
-        events[notify].push(fun);
-      else
-        events[notify] = [fun];
+      events[notify] ? events[notify].push(fun) : events[notify] = [fun];
     },
 
     onmessage: function(evt) {
@@ -291,7 +279,6 @@
               offset += 1;
               break;
             case "timestamp":
-              // 灏嗘椂闂存埑杞崲鎴愬井绉�
               val = val == undefined ? new Date().getTime() * 1000 : val;
               var arr = mod(val, 1000000, []);
               $.each(arr, function(i, v) {

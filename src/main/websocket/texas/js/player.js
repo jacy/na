@@ -64,9 +64,8 @@ Player = (function() {
 })();
 
 (function($) {
-  var players;
+  var players = {};
   $.player = {};
-  players = {};
   $.pp.reg("LOGIN", function(player) {
     $.player = new Player(player.id, $('#toolbar > #player'));
     $.player.update_balance();
