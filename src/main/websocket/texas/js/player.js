@@ -5,11 +5,14 @@ Player = (function() {
   function Player(pid, dom, info) {
     this.pid = pid;
     this.dom = dom;
-    this.info = info;
     this.set_inplay(0);
     this.set_photo($.rl.img.def_face_0);
     $.cache_player(this);
-    if (!this.info) {
+    if(info){
+    	this.info = info;
+    	this.set_nick(info.nick);
+    	this.set_inplay(info.inplay);
+    }else {
       $.ws.send($.pp.write({
         cmd: "PLAYER_QUERY",
         id: this.pid
@@ -19,8 +22,6 @@ Player = (function() {
       cmd: "PHOTO_QUERY",
       id: this.pid
     }));
-    if (this.info) this.set_nick(this.info.nick);
-    if (this.info) this.set_inplay(this.info.inplay);
   }
 
   Player.prototype.update_balance = function() {

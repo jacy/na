@@ -116,14 +116,14 @@
       {type: "integer", prop: "state"},
       {type: "integer", prop: "pid"},
       {type: "decimal", prop: "inplay"},
-      {type: "string",  prop: "nick", base64: true}]),
+      {type: "string",  prop: "nick", base64: false}]),
     notify_seat_state: generate_notify("SEAT_DETAIL", [83,
       {type: "integer", prop: "gid"},
       {type: "byte",    prop: "sn"},
       {type: "integer", prop: "state"},
       {type: "integer", prop: "pid"},
       {type: "decimal", prop: "inplay"},
-      {type: "string", prop: "nick", base64: true}]),
+      {type: "string", prop: "nick", base64: false}]),
     notify_seat_state: generate_notify("GAME_DETAIL", [81,
       {type: "integer", prop: "gid"},
       {type: "decimal", prop: "pot"},
@@ -233,7 +233,7 @@
       {type: "integer", prop: "pid"},
       {type: "byte",    prop: "sn"},
       {type: "decimal", prop: "inplay"},
-      {type: "string",  prop: "nick", base64: true}
+      {type: "string",  prop: "nick", base64: false}
     ])
   };
 

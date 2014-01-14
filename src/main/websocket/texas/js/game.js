@@ -374,7 +374,7 @@ $(function() {
     }
   });
   $.pp.reg("CANCEL", function(args) {
-    game.clear();
+    if(game)game.clear();
     log("");
     return log("===== " + (action('請等待其他玩家的加入')) + " =====");
   });
