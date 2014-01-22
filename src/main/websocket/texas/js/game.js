@@ -205,12 +205,12 @@ Game = (function() {
 
   Game.prototype.disable_actions = function(key) {
     if (key == null) {
-      $("#cmd_call").text('跟注');
-      $("#cmd_raise").text('加注');
+      $("#cmd_call").text('Call/跟');
+      $("#cmd_raise").text('Raise/加');
       return $("#game > .actions > *").attr("disabled", true).addClass('disabled');
     } else {
-      if (key === '#cmd_call') $("#cmd_call").text('跟注');
-      if (key === '#cmd_raise') $("#cmd_raise").text('加注');
+      if (key === '#cmd_call') $("#cmd_call").text('Call/跟');
+      if (key === '#cmd_raise') $("#cmd_raise").text('Raise/加');
       return $("#game > .actions").children(key).attr("disabled", true).addClass('disabled');
     }
   };
@@ -224,7 +224,7 @@ Game = (function() {
       this.disable_actions('#raise_range');
       this.disable_actions('#raise_number');
     } else {
-      $("#cmd_call").text("跟注 $" + args.call);
+      $("#cmd_call").text("Call/跟 $" + args.call);
     }
     return this.disable_actions(args.call === 0 ? '#cmd_call' : '#cmd_check');
   };
@@ -303,14 +303,11 @@ $(function() {
     return $(this).hide();
   });
   game_dom.bind('start_game', function(event, args) {
-    var cmd;
     $("#cmd_leave").attr('disabled', true).addClass('disabled');
     game = new Game(args.gid, game_dom);
     game.disable_actions();
-    cmd = {
-      gid: args.gid
-    };
     $.game = game;
+    var cmd = { gid: args.gid};
     switch (args.action) {
       case 'watch':
         $.extend(cmd, {
@@ -367,7 +364,7 @@ $(function() {
       if (detail.state === PS_ALL_IN) {
         return log("" + (nick(detail)) + " " + (action('ALL-IN')));
       } else if (detail.state === PS_FOLD) {
-        return log("" + (nick(detail)) + " " + (action('棄牌')));
+        return log("" + (nick(detail)) + " " + (action('FOLD')));
       } else if (detail.state === PS_OUT) {
         return log("" + (nick(detail)) + " " + (action('OUT')));
       }
@@ -376,13 +373,13 @@ $(function() {
   $.pp.reg("CANCEL", function(args) {
     if(game)game.clear();
     log("");
-    return log("===== " + (action('請等待其他玩家的加入')) + " =====");
+    return log("===== " + (action('Waitting players to join')) + " =====");
   });
   $.pp.reg("START", function(args) {
     if ($(".blockUI > .buyin").size() === 0) unblockUI();
     game.clear();
     log('');
-    return log("===== " + (action('新的牌局開始')) + " =====");
+    return log("===== " + (action('Starting new round')) + " =====");
   });
   $.pp.reg("END", function(args) {});
   $.pp.reg("DEALER", function(args) {
@@ -396,7 +393,7 @@ $(function() {
     var seat;
     seat = game.get_seat(args);
     seat.raise(args.blind, 0);
-    return log("" + (nick(seat)) + " " + (action('下盲注')) + " " + (money(args.blind)));
+    return log("" + (nick(seat)) + " " + (action('Blind Bet')) + " " + (money(args.blind)));
   });
   $.pp.reg("RAISE", function(args) {
     var seat, sum;
@@ -404,13 +401,13 @@ $(function() {
     seat = game.get_seat(args);
     if (sum === 0) {
       seat.check();
-      return log("" + (nick(seat)) + " " + (action('看牌')));
+      return log("" + (nick(seat)) + " " + (action('Checking/看牌')));
     } else {
       seat.raise(args.call, args.raise);
       if (args.raise === 0) {
-        return log("" + (nick(seat)) + " " + (action('跟注')) + " " + (money(args.call)));
+        return log("" + (nick(seat)) + " " + (action('Call/跟')) + " " + (money(args.call)));
       } else {
-        return log("" + (nick(seat)) + " " + (action('加注')) + " " + (money(args.raise)));
+        return log("" + (nick(seat)) + " " + (action('Raise/加')) + " " + (money(args.raise)));
       }
     }
   });
@@ -438,7 +435,7 @@ $(function() {
   });
   $.pp.reg("JOIN", function(args) {
     game.join(args);
-    return log("" + (nick(args)) + " " + (action('加入')));
+    return log("" + (nick(args)) + " " + (action('Join')));
   });
   $.pp.reg("LEAVE", function(args) {
     var seat;
@@ -473,7 +470,7 @@ $(function() {
     seat = game.get_seat(args);
     game.win(seat);
     seat.high();
-    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + (action('贏得')) + " " + (money(args.amount - args.cost));
+    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + (action('Win')) + " " + (money(args.amount - args.cost));
     log(msg);
     if ($(".blockUI > .buyin").size() === 0) {
       return growlUI("<div>" + msg + "</div>");

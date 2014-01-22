@@ -1,0 +1,7 @@
+Object {notify: "GAME_DETAIL", gid: 1, pot: 0, players: 0, seats: 9, high: 10, low: 5, max: 2000, min: 100, stage: 254 }
+---------------------------
+9 seat detail querys:
+Object {notify: "SEAT_DETAIL", gid: 1, sn: 1, state: 0, pid: 0, inplay: 0, nick: "" }
+---------------------------
+9 seat state querys:
+{notify: "SEAT_STATE", gid: 1, sn: 1, state: 0, pid: 0, inplay: 0, nick: "" }
