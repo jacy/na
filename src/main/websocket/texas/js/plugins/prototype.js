@@ -8,11 +8,12 @@
     read: function(bin) {
       var obj = notifys["NOTIFY_" + bin[0]];
       var data = obj ? obj.read(bin) : null;
-      console.log(data);
+      console.log("RECIEVE<<<<<", data);
       return data;
     },
 
     write: function(data) {
+    	console.log("Send------", data);
       return commands[data.cmd].write(data);
     },
 

@@ -1,5 +1,18 @@
 var EmptySeat, PlayingSeat, Seat;
-var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+var __hasProp = Object.prototype.hasOwnProperty;
+var __extends = function(child, parent) { 
+	for (var key in parent) { 
+		if (__hasProp.call(parent, key))  //  Kickout inherited properties
+			child[key] = parent[key];
+	} 
+	function Ctor() { 
+		this.constructor = child; 
+	} 
+	Ctor.prototype = parent.prototype;  // copies all the properties and methods including the constructor
+	child.prototype = new Ctor; // only instance copy everything from its prototype
+	child.__super__ = parent.prototype; 
+	return child; 
+};
 
 Seat = (function() {
 
