@@ -53,7 +53,7 @@ Game = (function() {
 
   Game.prototype.hide_empty = function() {
     var seat, _i, _len, _ref, _results;
-    $("#cmd_leave").attr('disabled', false).removeClass('disabled');
+    $("#cmd_standup").attr('disabled', false).removeClass('disabled');
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -67,7 +67,7 @@ Game = (function() {
 
   Game.prototype.show_empty = function() {
     var seat, _i, _len, _ref, _results;
-    $("#cmd_leave").attr('disabled', true).addClass('disabled');
+    $("#cmd_standup").attr('disabled', true).addClass('disabled');
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -303,7 +303,7 @@ $(function() {
     return $(this).hide();
   });
   game_dom.bind('start_game', function(event, args) {
-    $("#cmd_leave").attr('disabled', true).addClass('disabled');
+    $("#cmd_standup").attr('disabled', true).addClass('disabled');
     game = new Game(args.gid, game_dom);
     game.disable_actions();
     $.game = game;
@@ -347,6 +347,7 @@ $(function() {
   $.pp.reg("GAME_DETAIL", function(detail) {
     game.init(detail);
     if (detail.players < 2) {
+      log("===== " + (action('Waitting players to join')) + " =====");
       return growlUI("#tips_empty");
     } else {
       return unblockUI();
@@ -440,6 +441,7 @@ $(function() {
   $.pp.reg("LEAVE", function(args) {
     var seat;
     seat = game.get_seat(args);
+    console.log("leave seat: ", seat);
     return game.leave(seat);
   });
   $.pp.reg("UNWATCH", function(args) {
@@ -517,10 +519,11 @@ $(function() {
       gid: $.game.gid
     }));
   });
-  $('#cmd_leave').bind('click', function(event) {
+  $('#cmd_standup').bind('click', function(event) {
     return $.ws.send($.pp.write({
       cmd: "LEAVE",
-      gid: $.game.gid
+      gid: $.game.gid,
+      pid: $.player.pid
     }));
   });
 });

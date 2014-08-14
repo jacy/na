@@ -1,8 +1,7 @@
 $(function() {
-	var game, game_counter, game_list, game_preview, game_query, hall, template, watchGameHandler;
+	var game, game_counter, game_list, game_query, hall, template, watchGameHandler;
 	hall = $('#hall');
 	game = $('#game');
-	game_preview = $('#game_preview');
 	game_list = $('#game_list > tbody');
 	template = $('#hall > .template').text();
 	game_counter = 0;

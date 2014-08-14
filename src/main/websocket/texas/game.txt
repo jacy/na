@@ -1,3 +1,5 @@
+Send------ Object {gid: 6, cmd: "WATCH"} 
+------------------------------------------
 Object {notify: "GAME_DETAIL", gid: 1, pot: 0, players: 0, seats: 9, high: 10, low: 5, max: 2000, min: 100, stage: 254 }
 ---------------------------
 9 seat detail querys:
@@ -5,3 +7,16 @@ Object {notify: "SEAT_DETAIL", gid: 1, sn: 1, state: 0, pid: 0, inplay: 0, nick:
 ---------------------------
 9 seat state querys:
 {notify: "SEAT_STATE", gid: 1, sn: 1, state: 0, pid: 0, inplay: 0, nick: "" }
+-----------------------------
+Send {cmd: "JOIN", gid: 6, seat: 1, buyin: 2000}
+RECIEVE {notify: "JOIN", gid: 6, pid: 1, sn: 1, inplay: 2000, nick: "JacyHong"}
+
+Send {cmd: "PHOTO_QUERY", id: 1}
+RECIEVE {notify: "PHOTO_INFO", pid: 1, photo: ""} 
+--------------------------------
+Standup
+Send {cmd: "LEAVE", gid: 6} 
+--------------------------------
+Send {cmd: "UNWATCH", gid: 6}
+RECIEVE {notify: "UNWATCH", gid: 6} 
+------------------------------------

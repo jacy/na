@@ -53,7 +53,7 @@ Game = (function() {
 
   Game.prototype.hide_empty = function() {
     var seat, _i, _len, _ref, _results;
-    $("#cmd_standup").attr('disabled', false).removeClass('disabled');
+    $("#cmd_standup").show();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -67,7 +67,7 @@ Game = (function() {
 
   Game.prototype.show_empty = function() {
     var seat, _i, _len, _ref, _results;
-    $("#cmd_standup").attr('disabled', true).addClass('disabled');
+    $("#cmd_standup").hide();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -80,9 +80,6 @@ Game = (function() {
   };
 
   Game.prototype.leave = function(args) {
-	  console.log("==========================")
-	  console.log(args)
-	  console.log("==========================")
     var seat;
     seat = this.seats[args.sn];
     if (seat.__proto__.constructor === EmptySeat) return;
@@ -208,18 +205,18 @@ Game = (function() {
 
   Game.prototype.disable_actions = function(key) {
     if (key == null) {
-      $("#cmd_call").text('Call/跟');
-      $("#cmd_raise").text('Raise/加');
-      return $("#game > .actions > *").attr("disabled", true).addClass('disabled');
+      $("#cmd_call").text('Call');
+      $("#cmd_raise").text('Raise');
+      return $("#game > .actions > *").hide();
     } else {
-      if (key === '#cmd_call') $("#cmd_call").text('Call/跟');
-      if (key === '#cmd_raise') $("#cmd_raise").text('Raise/加');
-      return $("#game > .actions").children(key).attr("disabled", true).addClass('disabled');
+      if (key === '#cmd_call') $("#cmd_call").text('Call');
+      if (key === '#cmd_raise') $("#cmd_raise").text('Raise');
+      return $("#game > .actions").children(key).hide();
     }
   };
 
   Game.prototype.enable_actions = function(args) {
-    $("#game > .actions > *").attr("disabled", false).removeClass('disabled');
+    $("#game > .actions > *").show();
     if (args.call >= args.max) {
       $("#cmd_call").text("ALL-IN $" + args.max);
       this.disable_actions('#cmd_raise');
@@ -227,7 +224,7 @@ Game = (function() {
       this.disable_actions('#raise_range');
       this.disable_actions('#raise_number');
     } else {
-      $("#cmd_call").text("Call/跟 $" + args.call);
+      $("#cmd_call").text("Call $" + args.call);
     }
     return this.disable_actions(args.call === 0 ? '#cmd_call' : '#cmd_check');
   };
@@ -273,7 +270,7 @@ Game = (function() {
 })();
 
 $(function() {
-  var action, game, game_dom, hall_dom, log, log_empty, money, nick, private_card_sn, rank;
+  var action, game, game_dom, hall_dom, log, clearLogs, money, nick, private_card_sn, rank;
   game = null;
   game_dom = $('#game');
   hall_dom = $('#hall');
@@ -281,7 +278,7 @@ $(function() {
   log = function(msg) {
     return $('#logs').append("" + msg + "<br />").scrollTop($('#logs')[0].scrollHeight);
   };
-  log_empty = function() {
+  clearLogs = function() {
     return $('#logs').empty();
   };
   nick = function(o) {
@@ -298,7 +295,7 @@ $(function() {
     return "<strong class='rank'>" + r + "</strong>";
   };
   game_dom.bind('cancel_game', function(event, args) {
-    log_empty();
+    clearLogs();
     game.clear();
     game = null;
     $("#game > .playing_seat").remove();
@@ -306,7 +303,7 @@ $(function() {
     return $(this).hide();
   });
   game_dom.bind('start_game', function(event, args) {
-    $("#cmd_standup").attr('disabled', true).addClass('disabled');
+    $("#cmd_standup").hide();
     game = new Game(args.gid, game_dom);
     game.disable_actions();
     $.game = game;
@@ -329,7 +326,7 @@ $(function() {
     }
     $.ws.send($.pp.write(cmd));
     $(this).show();
-    return $(this).oneTime('3s', function() {
+    return $(this).oneTime(CONNECTION_TIMEOUT, function() {
       blockUI('#err_network');
     });
   });
@@ -350,7 +347,7 @@ $(function() {
   $.pp.reg("GAME_DETAIL", function(detail) {
     game.init(detail);
     if (detail.players < 2) {
-      log("===== " + (action('Waitting players to join')) + " =====");
+      log('Hi ' + nick($.player) + ', Welcome !');
       return growlUI("#tips_empty");
     } else {
       return unblockUI();
@@ -405,13 +402,13 @@ $(function() {
     seat = game.get_seat(args);
     if (sum === 0) {
       seat.check();
-      return log("" + (nick(seat)) + " " + (action('Checking/看牌')));
+      return log("" + (nick(seat)) + " " + (action('Checking')));
     } else {
       seat.raise(args.call, args.raise);
       if (args.raise === 0) {
-        return log("" + (nick(seat)) + " " + (action('Call/跟')) + " " + (money(args.call)));
+        return log("" + (nick(seat)) + " " + (action('Call')) + " " + (money(args.call)));
       } else {
-        return log("" + (nick(seat)) + " " + (action('Raise/加')) + " " + (money(args.raise)));
+        return log("" + (nick(seat)) + " " + (action('Raise')) + " " + (money(args.raise)));
       }
     }
   });
@@ -445,6 +442,7 @@ $(function() {
     var seat;
     seat = game.get_seat(args);
     console.log("leave seat: ", seat);
+    log("" + (nick(seat.player)) + " " + (action('Standup')));
     return game.leave(seat);
   });
   $.pp.reg("UNWATCH", function(args) {
@@ -482,23 +480,23 @@ $(function() {
     }
   });
   $("#game > .actions > [id^=cmd_fold]").bind('click', function() {
-    if ($(this).hasClass('disabled')) return;
+    if ($(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.fold();
   });
   $("#game > .actions > [id^=cmd_check]").bind('click', function() {
-    if ($(this).hasClass('disabled')) return;
+    if ($(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.check();
   });
   $("#game > .actions > [id^=cmd_call]").bind('click', function() {
-    if ($(this).hasClass('disabled')) return;
+    if ($(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.call();
   });
   $("#game > .actions > [id^=cmd_raise]").bind('click', function() {
     var amount;
-    if ($(this).hasClass('disabled')) return;
+    if ($(this).is(':visible')) return;
     if (!game.check_actor()) return;
     $('#raise_range').trigger('change');
     amount = parseInt($('#raise_range').val());
@@ -523,7 +521,7 @@ $(function() {
     }));
   });
   $('#cmd_standup').bind('click', function(event) {
-	game.disable_actions();
+	//game.disable_actions();
     return $.ws.send($.pp.write({
       cmd: "LEAVE",
       gid: $.game.gid,

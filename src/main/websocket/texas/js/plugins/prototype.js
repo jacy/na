@@ -72,7 +72,7 @@
     cmd_watch:  generate_cmd("UNWATCH", 
       [4, {type: "integer", prop: "gid"}]),
     cmd_watch:  generate_cmd("LEAVE", 
-      [9, {type: "integer", prop: "gid"}]),
+      [9, {type: "integer", prop: "gid"}, {type: "integer", prop: "pid"}]),
     cmd_watch:  generate_cmd("FOLD", 
       [7, {type: "integer", prop: "gid"}]),
     cmd_watch:  generate_cmd("RAISE", 

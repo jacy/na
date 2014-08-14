@@ -32,11 +32,11 @@ class Game
     @seats[seat_detail.sn].disable()
 
   hide_empty: ->
-    $("#cmd_leave").attr('disabled', false).removeClass('disabled')
+    $("#cmd_standup").attr('disabled', false).removeClass('disabled')
     seat.hide() for seat in @seats when seat? and seat.__proto__.constructor is EmptySeat
 
   show_empty: ->
-    $("#cmd_leave").attr('disabled', true).addClass('disabled')
+    $("#cmd_standup").attr('disabled', true).addClass('disabled')
     seat.show() for seat in @seats when seat? and seat.__proto__.constructor is EmptySeat
 
   leave: (args) ->
@@ -192,7 +192,7 @@ $ ->
     $(@).hide()
 
   game_dom.bind 'start_game', (event, args) ->
-    $("#cmd_leave").attr('disabled', true).addClass('disabled')
+    $("#cmd_standup").attr('disabled', true).addClass('disabled')
 
     game = new Game args.gid, game_dom
     game.disable_actions()
@@ -419,7 +419,7 @@ $ ->
   $('#cmd_cancel').bind 'click', (event) ->
     $.ws.send $.pp.write {cmd: "UNWATCH", gid: $.game.gid}
 
-  $('#cmd_leave').bind 'click', (event) ->
+  $('#cmd_standup').bind 'click', (event) ->
     $.ws.send $.pp.write {cmd: "LEAVE", gid: $.game.gid}
 
   return

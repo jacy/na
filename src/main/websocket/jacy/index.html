@@ -41,11 +41,13 @@
           <label class='balance'></label>
         </div>
         <div id='tools'>
+        	<!-- 
           <div id='settings'>Setting</div>
           <div class='split'></div>
           <div id='helps'>Help</div>
           <div class='split'></div>
           <div id='logout'>Logout</div>
+           -->
         </div>
       </nav>
       <div id='content'>
@@ -73,8 +75,8 @@
                 <th class='col_short'>ID</th>
                 <th class='col_longest'>Room</th>
                 <th class='col_short'>Stakes</th>
-                <th class='col_short'>Min/Max Buyin</th>
-                <th class='col_short'>Player</th>
+                <th class='col_short'>Min/Max BuyIn</th>
+                <th class='col_short'>Players</th>
               </tr>
             </thead>
             <tbody>
@@ -98,14 +100,16 @@
           <div id='logs'></div>
           <div class='actions'>
             <a class='action' id='cmd_fold'>Fold</a>
-            <a class='action' id='cmd_check'>Check/过牌</a>
-            <a class='action' id='cmd_call'>Call/跟</a>
-            <a class='action' id='cmd_raise'>Raise/加</a>
+            <a class='action' id='cmd_check'>Check</a>
+            <a class='action' id='cmd_call'>Call</a>
+            <a class='action' id='cmd_raise'>Raise</a>
             <input id='raise_range' max='50' min='0' type='range' value='0'>
             <input id='raise_number' max='50' min='0' step='1' type='number' value='0'>
           </div>
-          <a class='action' id='cmd_standup'>Standup</a>
-          <a class='action' id='cmd_cancel'>Quit</a>
+          <div>
+	          <a class='action' id='cmd_cancel'>Quit</a>
+	          <a class='action' id='cmd_standup'>Standup</a>
+          </div>
           <div class='buyin'>
             <h3>Joining</h3>
             <table>
@@ -131,7 +135,7 @@
           </div>
           <div class='template'>
             <div class='seat'></div>
-            <div class='empty_seat'>加入</div>
+            <div class='empty_seat'>Sit</div>
             <div class='playing_seat'>
               <label class='nick'></label>
               <img class='photo'>

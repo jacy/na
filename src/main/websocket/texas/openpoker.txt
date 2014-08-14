@@ -1,0 +1,266 @@
+source url:
+	https://github.com/xrdavies/openpoker-1.git
+how it works:
+	http://pylab.blogspot.sg/2007/03/openpoker-how-it-works.html
+
+bitwise use case:
+	http://students.info.uaic.ro/~georgiana.cazacu/RESURSE/Anul%20I/Semestrul%20I/AP/carti/C/C%20in%20Plain%20English/ch09/209-214.html
+
+bitwise poker hand valuator
+	http://www.codingthewheel.com/archives/poker-hand-evaluator-roundup/
+all in example
+	http://www.homepokertourney.com/allin_examples.htm
+------------------------------------------------------------
+make_card:
+(Face bsl 8) bor Suit.
+
+make_rep:
+Face = 1 bsl (H bsr 8)    // H bsr 8 gets origin face.
+Suit = H band 16#ff       // gets origin suit
+setelement(Suit, Rep, Old bor Face);
+
+1011             11
+101100000000     11 bsl 8
+10               2 
+101100000010     11 bsl 8 bor 2   
+100000000000     1 bsl 11 
+
+00000000000010   face 2
+00000000000100   face 3
+00000000001000   face 4
+00000000010000   face 5
+00000000100000   face 6
+10000000000000   face A
+10000000111110   face2 bor face3 bor face 4 bor face5 bor face6 bor faceA
+
+Mask = make_mask([C, D, H, S]) -> C bor D bor H bor S.   // miss 4 suits together
+Score = Mask band H,        // gets the current suit value.
+Count = bits:bits1(Score),  // get card counts.
+
+High1 = bits:clear_extra_bits(Score, 5),  %% only keep 5 high face
+-----------------------------------------------------------
+P=pot:new().
+P1=pot:add(P, 'A', 10,false).
+{pot,[],[],{side_pot,{1,{'A',10,nil,nil}},0}}
+
+P2=pot:add(P1, 'B', 10,false).
+{pot,[],[],{side_pot,{2,{'A',10,nil,{'B',10,nil,nil}}},0}}
+
+P3=pot:add(P2, 'C', 8, true).
+{pot,[{side_pot,{3,{'B',8,{'A',8,nil,nil},{'C',8,nil,nil}}},
+                8}],
+     [],
+     {side_pot,{2,{'B',2,{'A',2,nil,nil},nil}},0}}
+-------------------------------------------------------------
+1. debug 
+./start.sh
+schema:install().
+tv:start().
+server:start(['7799',localhost]). 
+
+%% tv:start().  % table visualizer
+
+2. Create player in client:
+player:create(<<"jacy">>,<<"jacy">>,<<"location_SG">>,10000).
+
+3.Test package:
+	pp:read(<<1,4,"jacy",4,"jacy">>).  // Package login
+	login:login(<<"jacy">>,<<"jacy">>, self()).  // Login result
+—————————————————————————————————————————————
+In a parameterized module (such as the greeting model), the variable THIS refers to the current module instance;
+------------------------------------------------------------
+Eunit
+include_lib("eunit/include/eunit.hrl").
+
+This will have the following effect:
+    Creates an exported function test() (unless testing is turned off, and the module does not already contain a test() function), that can be used to run all the unit tests defined in the module
+    Causes all functions whose names match ..._test() or ..._test_() to be automatically exported from the module (unless testing is turned off, or the EUNIT_NOAUTO macro is defined)
+    Makes all the preprocessor macros of EUnit available, to help writing tests
+-----------------------------------------------------------
+Every poker client connection is represented by two OpenPoker processes: the socket process and the actual player process. A visitor process with restricted functionality is used until the player logs in. Visitors cannot join games, for example. The socket process will be dead after a poker client disconnects while the player process will still be alive.
+------------------------------------------------------------
+make(R, #texas{}, Mods).
+  1) Mods: [ {game_wait_players, [StartDelay]} ] 
+        ++ 
+      [
+     %% blind rules
+     {blinds, []},
+     %% deal 2 cards to each player
+     {deal_cards, [2, private]}, 
+     %% start after BB, 3 raises
+     {betting, [?MAX_RAISES, ?GS_PREFLOP, true]}, 
+     %% show 3 shared cards
+     {deal_cards, [3, shared]}, 
+     %% flop
+     {betting, [?MAX_RAISES, ?GS_FLOP]}, 
+     %% show 1 more shared card
+     {deal_cards, [1, shared]}, 
+     %% turn
+     {betting, [?MAX_RAISES, ?GS_TURN]}, 
+     %% show 1 more shared card
+     {deal_cards, [1, shared]}, 
+     %% river
+     {betting, [?MAX_RAISES, ?GS_RIVER]}, 
+     %% showdown
+     {showdown, []}
+    ]
+      ++ 
+    [ {restart, []} ].
+
+   2) Ctx = #texas{b = none,sb = none,bb = none,no_sb = false,sb_all_in = false,sb_amt = 0,bb_amt = 0,sb_bet = 0,blind_type = normal,exp_player = none,exp_seat = none,exp_amt = 0,exp_min = 0,exp_max = 0,call = 0,have_blinds,max_raises,stage,deal_type,deal_count,winners = none}
+ 
+   3) R = #start_game{table_name = <<"test game">>,type,limit,seat_count,required = 2,start_delay = ?START_DELAY,player_timeout = ?PLAYER_TIMEOUT,rigged_deck = [],barrier
+   
+   4) Game = exch:new(game, Ctx, Mods) =====> Game = #exch{Cbk = game, Context = Ctx, Modules = Mods}.
+
+   5) exch:start(self(), [R]) ====> self() is the process id of server.
+
+   6) exch:start(Parent, R) ->
+	Id = Cbk:id(), % Id ＝　mnesia:dirty_update_counter(tab_counter, game, 1).
+        gen_server:start({global, {Cbk, Id}}, THIS, [Parent, Id|R], []).  % global:whereis_name({game,900}).
+
+　　７) exch:init(Args = [Parent|_]) ->
+	{Data, Start} = game:start(tl(Args)), % tl -> get the tail of list, so gets GID | R
+		game:start([GID, R = #start_game{}]) ->
+			db:write(#tab_game_xref {gid = GID,process = self(),type = R#start_game.type,limit = R#start_game.limit,table_name = R#start_game.table_name,seat_count = R#start_game.seat_count,timeout = R#start_game.player_timeout,required = R#start_game.required})
+			Game = #game {
+			      gid = GID,
+			      type = R#start_game.type, 
+			      limit = case (R#start_game.limit)#limit.type of
+			                  ?LT_FIXED_LIMIT -> fixed_limit;
+			                  ?LT_POT_LIMIT -> pot_limit;
+			                  ?LT_NO_LIMIT -> no_limit
+			              end,
+			      low = (R#start_game.limit)#limit.low, 
+			      high = (R#start_game.limit)#limit.high, 
+			      deck = deck:new(R#start_game.rigged_deck),
+			      pot = pot:new(),
+			      seats = g:create_seats(R#start_game.seat_count),
+			      required_player_count = R#start_game.required,
+			      timeout = R#start_game.player_timeout,
+			      tourney = none
+			     },
+			    {Game, R}.	
+	Exch = #exch{parent = Parent,data = Data, modules = Modules, stack = Modules, ctx = Context, orig_ctx = Context },
+   	case init(Exch, R) of
+        	{stop, _, Exch1} -> {stop, Exch1}; % stop gen_server
+       		{noreply, Exch1} ->  {ok, Exch1}
+    	end.
+
+	init(Exch = #exch{ stack = [{Mod, Params}|_] }, Event) ->
+    		Ctx = Exch#exch.ctx,
+    		Result = Mod:start(Exch#exch.data, Ctx, Params),
+		Exch1 = Exch#exch{ orig_ctx = Ctx, state = none },
+    		advance(Exch1, Event, Result).
+
+	advance(Exch = #exch{}, _, {next, State, Data, Ctx}) ->
+   		%% advance to the next state
+    		{noreply, Exch#exch{ state = State, data = Data, ctx = Ctx }};
+	
+    8)	game_wait_players:start(Game, Ctx, [Delay]) ->
+    		Game1 = g:restart_timer(Game, Delay),  % #game{ timer = erlang:start_timer(Timeout, self(), none) }
+    		%% reset call amount
+    		Ctx1 = Ctx#texas{ call = 0 },
+    		{next, wait_for_players, Game1, Ctx1}.
+    		
+----------------------------------------------------------------
+	Overview
+1. server starting games logics
+ A. Loading game configs from DB.
+ B. Setup each game by configs.
+ C. Exch:new(cbk=subModule,context=#texus,mod=modules)
+    on init_1:
+ 	Start process link to subModule.id
+        {Data, Start} = subModule.start(id()| #start_game{}),
+		subModule.start(id,#start_game){
+			init pot, dock,seats....
+			return {Game={current game instance related info like gid, limits, pot, seats}, #start_game}
+		}
+	Exch = #exch{ parent = Parent, data = Data, modules = Modules, stack = Modules, ctx = Context, orig_ctx = Context },
+	
+    case init(Exch, Start) of
+		{stop, _, Exch1} ->
+		    {stop, Exch1};
+		{noreply, Exch1} ->
+		    {ok, Exch1}
+	    end.
+	    
+	 on init_2:(#exch, Event):  % Start One Model
+	 	Exch1 = Exch#exch{ orig_ctx = Ctx, state = none },
+	 	Result = Mod:start(Exch1, Ctx, ModParams),
+	 			game_wait_players:start(Game, Ctx, [Delay]) ->
+	 			%% Starts a timer which will send the message {timeout, TimerRef, Msg} to Dest after Time milliseconds.
+    			Game1 = g:restart_timer(Game, Delay),  % #game{ timer = erlang:start_timer(Timeout, self(), none) }
+    			%% reset call amount
+    			Ctx1 = Ctx#texas{ call = 0 },
+    			{next, wait_for_players, Game1, Ctx1}.
+    	advance(Exch1, Event, Result).
+    		1) for Event next
+    				advance(Exch = #exch{}, _, {next, State, Data, Ctx}) ->
+    					%% advance to the next state
+    					{noreply, Exch#exch{ state = State, data = Data, ctx = Ctx }};
+	 	
+	 Handler the time out event sent by the timer: 
+		 process_cast(Event={timeout,#Ref<0.0.0.324>,none}, Exch) ->
+  			  {Mod, _} = hd(Exch#exch.stack),
+			  State = Exch#exch.state,
+			  Data = Exch#exch.data,
+			  Ctx = Exch#exch.ctx,
+			  io:format("Exch process cast, Event=~w~nState=~w~nData=~w~n------------------------~n", [Event,State,Data]),
+
+			  case Cbk:cast(Event, Ctx, Data) of
+			    skip ->
+				      Result = Mod:State(Data, Ctx, Event),
+								      		wait_for_players(Game, Ctx, {timeout, _, _}) ->
+											  Ready = g:get_seats(Game, ?PS_READY),
+											  ReqCount = Game#game.required_player_count,
+											  Start = (length(Ready) >= ReqCount),
+											  Empty = g:is_empty(Game),
+											  if
+											    Start ->
+											      Game1 = g:notify_start_game(Game),
+											      {stop, Game1, Ctx};
+											    Empty ->
+											      {repeat, Game, Ctx};
+											    true ->
+											      Game1 = g:notify_cancel_game(Game),
+											      {repeat, Game1, Ctx}
+											  end;
+				      advance(Exch, Event, Result);
+				      					advance(Exch = #exch{}, Event, {repeat, Data, _}) ->
+											    Exch1 = Exch#exch{ data = Data, ctx = Exch#exch.orig_ctx },
+											    init(Exch1, Event);
+			    {NewGame, NewCtx}->
+			      {noreply, Exch#exch{ data = NewGame, ctx = NewCtx }}
+			  end.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

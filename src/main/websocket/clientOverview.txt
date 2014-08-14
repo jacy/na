@@ -1,0 +1,98 @@
+1. $.positions
+2. $.rl
+3. $.pp = {reg(); read(); write(); onMessage();}
+4. $.ws = {send(); init(); }
+
+5. var Player = function(pid, dom, info){};
+   $.player = {};
+   $.cache_player = function(){};
+   $.clear_players = function(){};
+
+   $.pp.reg("LOGIN",function(data){});
+   $.pp.reg("BALANCE_INFO",function(data){});
+   $.pp.reg("PLAYER_INFO",function(data){});
+   $.pp.reg("PHOTO_INFO",function(data){});
+
+6. var GamePreview = function(gid,dom){};
+   $.game_preview;
+   
+
+7. $('#cmd_watch').bind('click', function(){});
+   $('#hall').bind('setup', function(){});
+   $('#hall').bind('reload', function() {});
+   $('#hall').bind('loaded', function() {});
+   $('#hall').bind('start_game', function() {});
+   $('#hall').bind('cancel_game', function() {});
+   $('#hall').bind('setup', function() {});
+
+   $.pp.reg("GAME_INFO", function(data){});
+
+8. var EmptySeat, PlayingSeat, Seat = function(){};
+   $.compute_bet_count = funciton(sum, bets){};
+   $.compare_card = function(a, b){};
+
+   $("#game .empty_seat").bind('click', function(){});
+   $(".buyin #cmd_buy").bind('click', function(){});
+   $(".buyin #cmd_cancel").bind('click', function(){});
+   $(".buyin #range_buy").bind('click', function(){});
+   $("#cmd_up").bind('click', function(){});
+   $("#cmd_exit").bind('click', function() {});
+
+9. var Game = function(gid,dom){};
+   $('#game').bind('start_game', function(event, args) { $.game = new Game(gid, gameDom)});
+   $("#game").bind('inited', function() {});
+
+   var game = new Game(gid, game_dom);
+   $.game = game;
+   
+   game.seats=[];
+
+   $.get_poker = function(face, suit) {};
+   $.find_poker = function(face, suit, pokers) {};
+   $.pp.reg("GAME_DETAIL", function(data){});
+   $.pp.reg("SEAT_DETAIL", function(data){});
+   $.pp.reg("SEAT_STATE", function(data){});
+   $.pp.reg("CANCEL", function(data){});
+   $.pp.reg("START", function(data){});
+   $.pp.reg("END", function(data){});
+   $.pp.reg("SBLIND", function(data){});
+   $.pp.reg("BBLIND", function(data){});
+   $.pp.reg("BLIND", function(data){});
+   $.pp.reg("RAISE", function(data){});
+   $.pp.reg("DRAW", function(data){});
+   $.pp.reg("SHARE", function(data){});
+   $.pp.reg("PRIVATE", function(data){});
+   $.pp.reg("ACTOR", function(data){});
+   $.pp.reg("STAGE", function(data){});
+   $.pp.reg("JOIN", function(data){});
+   $.pp.reg("LEAVE", function(data){});
+   $.pp.reg("UNWATCH", function(data){});
+   $.pp.reg("BET_REQ", function(data){});
+   $.pp.reg("SHOW", function(data){});
+   $.pp.reg("HAND", function(data){});
+   $.pp.reg("WIN", function(data){});
+
+   $("#game > .actions > [id^=cmd_fold]").bind('click', function(){});
+   $("#game > .actions > [id^=cmd_check]").bind('click', function() {});
+   $("#game > .actions > [id^=cmd_call]").bind('click', function() {});
+   $("#game > .actions > [id^=cmd_raise]").bind('click', function() {});
+   $("#game > .actions > [id^=cmd]").bind('click', function() {});
+   $('#raise_range, #raise_number').bind('change', function(event) {});
+   $('#cmd_cancel').bind('click', function(event) {});
+   $('#cmd_standup').bind('click', function(event) {});
+
+10.var format= function(){};
+   var growlUI = function(id,opt){};
+   var blockUI = function(o, timeout){};
+   var unblockUI = function(){};
+
+   blockUI("#msg_connect");
+
+   $('#singin > form').bind("submit", function(){});
+   $('#singin > form').bind("stop", function(){});
+   $('#toolbar > #player').bind('singin', function(){});
+   $.pp.reg('ERROR', function(){});
+
+   $.ws.defaults.onmessage = $.pp.onmessage;
+   $.ws.defaults.onopen = on_open;
+   $.ws.init();
