@@ -96,6 +96,7 @@ PlayingSeat = (function() {
     this.player.set_nick();
     this.dom.children(".card").remove();
     this.dom.children(".high_label").removeClass("high_label");
+    this.dom.children('.draw_card').hide();
     return this.dom.removeClass('disabled');
   };
 

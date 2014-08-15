@@ -100,7 +100,7 @@ Game = (function() {
     var seat, _i, _len, _ref, _results;
     this.stage = GS_PREFLOP;
     $.positions.reset_share();
-    $(".bet, .pot, .card").remove();
+    $(".bet, .pot, .card,").remove();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -373,14 +373,11 @@ $(function() {
   });
   $.pp.reg("CANCEL", function(args) {
     if(game)game.clear();
-    log("");
-    return log("===== " + (action('Waitting players to join')) + " =====");
   });
   $.pp.reg("START", function(args) {
     if ($(".blockUI > .buyin").size() === 0) unblockUI();
     game.clear();
-    log('');
-    return log("===== " + (action('Starting new round')) + " =====");
+    return log((action('Starting new round')));
   });
   $.pp.reg("END", function(args) {});
   $.pp.reg("DEALER", function(args) {
@@ -480,23 +477,23 @@ $(function() {
     }
   });
   $("#game > .actions > [id^=cmd_fold]").bind('click', function() {
-    if ($(this).is(':visible')) return;
+    if (!$(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.fold();
   });
   $("#game > .actions > [id^=cmd_check]").bind('click', function() {
-    if ($(this).is(':visible')) return;
+    if (!$(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.check();
   });
   $("#game > .actions > [id^=cmd_call]").bind('click', function() {
-    if ($(this).is(':visible')) return;
+    if (!$(this).is(':visible')) return;
     if (!game.check_actor()) return;
     return game.call();
   });
   $("#game > .actions > [id^=cmd_raise]").bind('click', function() {
     var amount;
-    if ($(this).is(':visible')) return;
+    if (!$(this).is(':visible')) return;
     if (!game.check_actor()) return;
     $('#raise_range').trigger('change');
     amount = parseInt($('#raise_range').val());
