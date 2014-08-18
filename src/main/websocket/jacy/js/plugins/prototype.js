@@ -147,7 +147,8 @@
     ]),
     notify_seat_state: generate_notify("STAGE", [29,
       {type: "integer", prop: "gid"},
-      {type: "byte", prop: "stage"}
+      {type: "byte", prop: "stage"},
+      {type: "decimal", prop: "pot"}
     ]),
     notify_seat_state: generate_notify("PRIVATE", [82,
       {type: "integer", prop: "gid"},

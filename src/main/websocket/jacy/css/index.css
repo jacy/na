@@ -475,13 +475,14 @@ strong.rank {
       height: 41px;
       position: absolute;
       display: none; }
-    #game > .playing_seat .bet_lab {
+    #game .bet_lab, #game > .playing_seat .bet_lab {
       width: 45px;
       height: 12px;
       font-size: 12px;
       position: absolute;
       border-radius: 20px;
       background-color: #77B73E;
+      text-align:center;
       display: none; }
     #game > .playing_seat .actor_timer {
       top: 0px;
@@ -501,7 +502,7 @@ strong.rank {
 		background: linear-gradient(top, red 0%, yellow 40%); /* for IE */
         border-radius: 4px;
         transition-property: all;
-        transition-duration: 10s;
+        transition-duration: 15s;
         transition-timing-function: ease-in; 
         
         }

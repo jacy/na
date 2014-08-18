@@ -101,6 +101,7 @@ Game = (function() {
     this.stage = GS_PREFLOP;
     $.positions.reset_share();
     $(".bet, .pot, .card,").remove();
+    $("#pot_0 label").text('').hide();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -144,7 +145,7 @@ Game = (function() {
     }
   };
 
-  Game.prototype.new_stage = function(stage) {
+  Game.prototype.new_stage = function(stage,pot) {
     var ref, seat, _i, _len, _ref;
     this.stage = stage;
     _ref = this.seats;
@@ -157,12 +158,13 @@ Game = (function() {
     ref = this.dom;
     return this.dom.oneTime('0.3s', function() {
       var bet, _j, _len2, _ref2, _results;
-      _ref2 = ref.children(".bet");
+      _ref2 = ref.children(".bet"); // This element never got removed,,it just replace its css from bet to pot so  next time won't be selected again.
       _results = [];
       for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
         bet = _ref2[_j];
-        _results.push($(bet).css($.positions.get_random([240, 680], 20)).removeClass('bet').addClass('pot'));
+        _results.push($(bet).css({top:'270px' ,left:'480px'}).removeClass('bet').addClass('pot'));
       }
+      $('#pot_0 label').text(pot).show();
       return _results;
     });
   };
@@ -429,7 +431,7 @@ $(function() {
     if (!game.check_actor()) return game.disable_actions();
   });
   $.pp.reg("STAGE", function(args) {
-    if (args.stage !== GS_PREFLOP) return game.new_stage(args.stage);
+    if (args.stage !== GS_PREFLOP) return game.new_stage(args.stage,args.pot);
   });
   $.pp.reg("JOIN", function(args) {
     game.join(args);

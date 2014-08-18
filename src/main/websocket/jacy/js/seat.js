@@ -136,8 +136,7 @@ PlayingSeat = (function() {
   };
 
   PlayingSeat.prototype.raise_bet = function(img, ps) {
-    var bet;
-    bet = $("<img class='bet' src='" + img + "' />").css(ps.start).appendTo(this.game.dom);
+    var bet = $("<img class='bet' src='" + img + "' />").css(ps.start).appendTo(this.game.dom);
     return $(this.dom).oneTime(100, function() {
       return bet.css($.positions.get_random(ps.end, 5));
     });
