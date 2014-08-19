@@ -80,10 +80,12 @@ Game = (function() {
   };
 
   Game.prototype.leave = function(args) {
-    var seat;
-    seat = this.seats[args.sn];
+    var seat  = this.seats[args.sn];
     if (seat.__proto__.constructor === EmptySeat) return;
-    if (args.player.pid === $.player.pid) this.player = null;
+    if (args.player.pid === $.player.pid) {
+    	this.disable_actions();
+    	this.player = null;
+    }
     this.seats[seat.sn].clear();
     this.seats[seat.sn].remove();
     this.seats[seat.sn] = new EmptySeat({
@@ -162,9 +164,11 @@ Game = (function() {
       _results = [];
       for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
         bet = _ref2[_j];
-        _results.push($(bet).css({top:'270px' ,left:'480px'}).removeClass('bet').addClass('pot'));
+        _results.push($(bet).css({top:'270px' ,left:'270px'}).removeClass('bet').addClass('pot'));
       }
-      $('#pot_0 label').text(pot).show();
+      if(undefined != pot){
+    	  $('#pot_0 label').text(pot).show();
+      }
       return _results;
     });
   };
@@ -438,8 +442,7 @@ $(function() {
     return log("" + (nick(args)) + " " + (action('Join')));
   });
   $.pp.reg("LEAVE", function(args) {
-    var seat;
-    seat = game.get_seat(args);
+    var seat = game.get_seat(args);
     console.log("leave seat: ", seat);
     log("" + (nick(seat.player)) + " " + (action('Standup')));
     return game.leave(seat);
@@ -450,6 +453,7 @@ $(function() {
   });
   $.pp.reg("BET_REQ", function(args) {
     game.enable_actions(args);
+    $("#cmd_standup").show();
     return $('#raise_range, #raise_number').val(args.min).attr('min', args.min).attr('max', args.max);
   });
   $.pp.reg("SHOW", function(args) {
@@ -520,8 +524,10 @@ $(function() {
     }));
   });
   $('#cmd_standup').bind('click', function(event) {
-	//game.disable_actions();
-    return $.ws.send($.pp.write({
+   if($("#game > .actions > [id^=cmd_fold]").is(':visible')){
+	   $("#game > .actions > [id^=cmd_fold]").click();
+   }
+   return $.ws.send($.pp.write({
       cmd: "LEAVE",
       gid: $.game.gid,
       pid: $.player.pid

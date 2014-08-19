@@ -6,9 +6,13 @@
 
   $.pp = {
     read: function(bin) {
-      var obj = notifys["NOTIFY_" + bin[0]];
+      var type = bin[0];
+      var obj = notifys["NOTIFY_" + type];
+      var TYPE_CANCEL = 25;
       var data = obj ? obj.read(bin) : null;
-      console.log("RECIEVE<<<<<", data);
+      if(TYPE_CANCEL != type){
+    	  console.log("RECIEVE<<<<<", data);
+      }
       return data;
     },
 
