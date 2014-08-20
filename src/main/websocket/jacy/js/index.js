@@ -1,4 +1,4 @@
-var blockUI, format, growlUI, unblockUI;
+var blockUI, format, growlUI,unGrowUI, unblockUI;
 
 format = function(str, step, splitor) {
 	var arr, first, i, l1, l2, len;
@@ -36,6 +36,10 @@ growlUI = function(id, opt) {
 		conf = $.extend(conf, opt);
 	return $('#page').block(conf);
 };
+
+unGrowUI=function(){
+	$('#page').unblock();
+}
 
 blockUI = function(o, timeout) {
 	$.blockUI({

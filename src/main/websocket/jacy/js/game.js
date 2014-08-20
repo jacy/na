@@ -381,6 +381,7 @@ $(function() {
     if(game)game.clear();
   });
   $.pp.reg("START", function(args) {
+	if(!game)return;
     if ($(".blockUI > .buyin").size() === 0) unblockUI();
     game.clear();
     log('----------------------------------------');
@@ -403,6 +404,7 @@ $(function() {
     return log("" + (nick(seat)) + " " + (action('Blind Bet')) + " " + (money(args.blind)));
   });
   $.pp.reg("RAISE", function(args) {
+	 if(!game)return;
     var seat, sum;
     sum = args.call + args.raise;
     seat = game.get_seat(args);
@@ -453,6 +455,7 @@ $(function() {
     return game.leave(seat);
   });
   $.pp.reg("UNWATCH", function(args) {
+	unGrowUI();
     game_dom.trigger('cancel_game');
     return hall_dom.trigger('cancel_game');
   });
@@ -476,6 +479,7 @@ $(function() {
     if (game.check_actor()) return seat.high();
   });
   $.pp.reg("WIN", function(args) {
+	if(!game)return;
     var msg, seat;
     game.disable_actions();
     game.clear_actor();
