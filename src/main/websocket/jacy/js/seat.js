@@ -97,6 +97,7 @@ PlayingSeat = (function() {
     this.dom.children(".card").remove();
     this.dom.children(".high_label").removeClass("high_label");
     this.dom.children('.draw_card').hide();
+    this.reset_bet();
     return this.dom.removeClass('disabled');
   };
 

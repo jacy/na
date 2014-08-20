@@ -383,9 +383,12 @@ $(function() {
   $.pp.reg("START", function(args) {
     if ($(".blockUI > .buyin").size() === 0) unblockUI();
     game.clear();
+    log('----------------------------------------');
     return log((action('Starting new round')));
   });
-  $.pp.reg("END", function(args) {});
+  $.pp.reg("END", function(args) {
+	  if(game)game.clear();
+  });
   $.pp.reg("DEALER", function(args) {
     var seat;
     seat = game.get_seat(args);
@@ -439,12 +442,14 @@ $(function() {
   });
   $.pp.reg("JOIN", function(args) {
     game.join(args);
+    $.player.update_balance();
     return log("" + (nick(args)) + " " + (action('Join')));
   });
   $.pp.reg("LEAVE", function(args) {
     var seat = game.get_seat(args);
     console.log("leave seat: ", seat);
     log("" + (nick(seat.player)) + " " + (action('Standup')));
+    $.player.update_balance();
     return game.leave(seat);
   });
   $.pp.reg("UNWATCH", function(args) {
@@ -472,6 +477,7 @@ $(function() {
   });
   $.pp.reg("WIN", function(args) {
     var msg, seat;
+    game.disable_actions();
     game.clear_actor();
     seat = game.get_seat(args);
     game.win(seat);
@@ -524,9 +530,6 @@ $(function() {
     }));
   });
   $('#cmd_standup').bind('click', function(event) {
-   if($("#game > .actions > [id^=cmd_fold]").is(':visible')){
-	   $("#game > .actions > [id^=cmd_fold]").click();
-   }
    return $.ws.send($.pp.write({
       cmd: "LEAVE",
       gid: $.game.gid,

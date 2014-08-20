@@ -5,14 +5,10 @@
   var events = new Object();
 
   $.pp = {
-    read: function(bin) {
-      var type = bin[0];
-      var obj = notifys["NOTIFY_" + type];
-      var TYPE_CANCEL = 25;
+	read: function(bin) {
+      var obj = notifys["NOTIFY_" + bin[0]];
       var data = obj ? obj.read(bin) : null;
-      if(TYPE_CANCEL != type){
-    	  console.log("RECIEVE<<<<<", data);
-      }
+      console.log("RECIEVE<<<<<", data);
       return data;
     },
 
