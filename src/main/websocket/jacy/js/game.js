@@ -388,6 +388,7 @@ $(function() {
     return log((action('Starting new round')));
   });
   $.pp.reg("END", function(args) {
+	  if(game)game.clear();
   });
   $.pp.reg("DEALER", function(args) {
     var seat;
