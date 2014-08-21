@@ -413,11 +413,11 @@ $(function() {
       return log("" + (nick(seat)) + " " + (action('Checking')));
     } else {
       seat.raise(args.call, args.raise);
-      if (args.raise === 0) {
-        return log("" + (nick(seat)) + " " + (action('Call')) + " " + (money(args.call)));
-      } else {
-        return log("" + (nick(seat)) + " " + (action('Raise')) + " " + (money(args.raise)));
-      }
+	  if (args.raise === 0) {
+		return log("" + (nick(seat)) + " " + (action('Call')) + " " + (money(args.call)));
+	  } else {
+		return log("" + (nick(seat)) + " " + (action('Raise')) + " " + (money(args.raise)));
+	  }
     }
   });
   $.pp.reg("DRAW", function(args) {

@@ -97,6 +97,7 @@ PlayingSeat = (function() {
     this.dom.children(".card").remove();
     this.dom.children(".high_label").removeClass("high_label");
     this.dom.children('.draw_card').hide();
+    this.dom.children('.dealer').remove();
     this.reset_bet();
     return this.dom.removeClass('disabled');
   };
@@ -124,7 +125,7 @@ PlayingSeat = (function() {
 
   PlayingSeat.prototype.raise = function(call, raise) {
     var bet, bets, ps, _i, _len, _results;
-    this.bet += call + raise;
+    this.bet += (call + raise);
     this.dom.children('.bet_lab').text(this.bet).show();
     ps = $.positions.get_bet(this.sn);
     bets = $.compute_bet_count(call + raise, []);
@@ -151,8 +152,7 @@ PlayingSeat = (function() {
   PlayingSeat.prototype.check = function() {};
 
   PlayingSeat.prototype.set_dealer = function() {
-    var dealer;
-    dealer = $('.playing_seat > .dealer');
+    var dealer = $('.playing_seat > .dealer');
     if (dealer.size() === 0) {
       return $('#game > .template > .dealer').clone().insertBefore(this.dom.children(".nick"));
     } else {
