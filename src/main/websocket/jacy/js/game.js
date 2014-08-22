@@ -472,8 +472,7 @@ $(function() {
     return seat.private_card(args.face2, args.suit2, 2);
   });
   $.pp.reg("HAND", function(args) {
-    var seat;
-    seat = game.get_seat(args);
+    var seat = game.get_seat(args);
     seat.set_hand(args);
     seat.set_rank();
     if (game.check_actor()) return seat.high();
