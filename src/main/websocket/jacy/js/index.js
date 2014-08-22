@@ -28,7 +28,7 @@ growlUI = function(id, opt) {
 		message : $(id).clone(),
 		fadeIn : 700,
 		fadeOut : 700,
-		timeout : 6000,
+		timeout : 2000,
 		showOverlay : false,
 		css : GROWLUI
 	};
