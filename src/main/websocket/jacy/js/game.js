@@ -304,7 +304,7 @@ $(function() {
 	  return "<strong class='rank'>" + r + "</strong>";
   };
   logCard = function(cs) {
-	  return $.map(cs,function(card){return '<span class="' + SUITS[card.suit] + '"> &' + SUITS[card.suit] + ';' + FACES[card.face]  + '</span>' }).join('');
+	  return $.map(cs,function(card){return '<span class="' + SUITS[card.suit] + '">&' + SUITS[card.suit] + ';' + FACES[card.face]  + '</span>' }).join('');
   };
   game_dom.bind('cancel_game', function(event, args) {
     clearLogs();

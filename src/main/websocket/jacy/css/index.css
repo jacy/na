@@ -506,3 +506,6 @@ strong.rank {
         transition-timing-function: ease-in; 
         
         }
+
+        .diams,.hearts {color: #f00 !important;font-size:12px;font-weight:bold;}
+		.spades,.clubs {color: #000 !important;font-size:12px;font-weight:bold;}
