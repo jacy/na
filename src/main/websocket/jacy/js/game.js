@@ -12,6 +12,7 @@ Game = (function() {
     this.detail = detail;
     this.stage = GS_PREFLOP;
     this.seats = [];
+    this.cards = [];
     return this.dom.trigger('inited');
   };
 
@@ -90,7 +91,7 @@ Game = (function() {
     this.seats[seat.sn].remove();
     this.seats[seat.sn] = new EmptySeat({
       sn: args.sn
-    }, this);
+    }, this, seat.cards);
     if (this.player) {
       return this.hide_empty();
     } else {
@@ -101,6 +102,7 @@ Game = (function() {
   Game.prototype.clear = function() {
     var seat, _i, _len, _ref, _results;
     this.stage = GS_PREFLOP;
+    this.cards = [];
     $.positions.reset_share();
     $(".bet, .pot, .card,").remove();
     $("#pot_0 label").text('').hide();
@@ -174,6 +176,7 @@ Game = (function() {
   };
 
   Game.prototype.share_card = function(face, suit) {
+	$.push_card(this.cards,face,suit);
     return $.get_poker(face, suit).css($.positions.get_next_share()).appendTo(this.dom);
   };
 
@@ -298,7 +301,10 @@ $(function() {
     return "<strong class='action'>" + a + "</strong>";
   };
   rank = function(r) {
-    return "<strong class='rank'>" + r + "</strong>";
+	  return "<strong class='rank'>" + r + "</strong>";
+  };
+  logCard = function(cs) {
+	  return $.map(cs,function(card){return '<span class="' + SUITS[card.suit] + '"> &' + SUITS[card.suit] + ';' + FACES[card.face]  + '</span>' }).join('');
   };
   game_dom.bind('cancel_game', function(event, args) {
     clearLogs();
@@ -349,6 +355,9 @@ $(function() {
     if (face != null) return pokers.filter("[face=" + face + "]");
     if (suit != null) return pokers.filter("[suit=" + suit + "]");
     return $(".card");
+  };
+  $.push_card=function(c,face,suit){
+	  c.push({'face':face,'suit':suit});
   };
   $.pp.reg("GAME_DETAIL", function(detail) {
     game.init(detail);
@@ -433,6 +442,8 @@ $(function() {
     private_card_sn += 1;
     seat = game.get_seat(args);
     seat.private_card(args.face, args.suit, private_card_sn);
+	$.push_card(seat.cards,args.face,args.suit);
+    
     if (private_card_sn === 2) private_card_sn = 0;
   });
   $.pp.reg("ACTOR", function(args) {
@@ -469,6 +480,10 @@ $(function() {
     game.new_stage();
     seat = game.get_seat(args);
     seat.private_card(args.face1, args.suit1, 1);
+    if (args.pid != $.player.pid) {
+    	$.push_card(seat.cards,args.face1,args.suit1);
+    	$.push_card(seat.cards,args.face2,args.suit2);
+    }
     return seat.private_card(args.face2, args.suit2, 2);
   });
   $.pp.reg("HAND", function(args) {
@@ -484,8 +499,8 @@ $(function() {
     game.clear_actor();
     seat = game.get_seat(args);
     game.win(seat);
-    seat.high();
-    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + (action('Win')) + " " + (money(args.amount - args.cost));
+    var c = seat.high();
+    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + logCard(c) + ' ' + (action('Win')) + " " + (money(args.amount - args.cost));
     log(msg);
     if ($(".blockUI > .buyin").size() === 0) {
       return growlUI("<div>" + msg + "</div>");

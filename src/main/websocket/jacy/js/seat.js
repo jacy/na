@@ -16,11 +16,13 @@ var __extends = function(child, parent) {
 
 Seat = (function() {
 
-  function Seat(detail, game) {
+  function Seat(detail, game, cards) {
     this.detail = detail;
     this.game = game;
     this.sn = this.detail.sn;
     this.init_dom();
+    cards =  cards || [];
+    this.cards = cards;
   }
 
   Seat.prototype.init_dom = function() {
@@ -47,9 +49,11 @@ EmptySeat = (function() {
 
   __extends(EmptySeat, Seat);
 
-  function EmptySeat(detail, game) {
+  function EmptySeat(detail, game, cards) {
     this.detail = detail;
     this.game = game;
+    cards =  cards || [];
+    this.cards = cards;
     EmptySeat.__super__.constructor.apply(this, arguments);
   }
 
@@ -69,7 +73,9 @@ EmptySeat = (function() {
     return this.dom.show();
   };
 
-  EmptySeat.prototype.clear = function() {};
+  EmptySeat.prototype.clear = function() {
+	  this.cards = [];
+  };
 
   return EmptySeat;
 
@@ -79,9 +85,11 @@ PlayingSeat = (function() {
 
   __extends(PlayingSeat, Seat);
 
-  function PlayingSeat(detail, game) {
+  function PlayingSeat(detail, game, cards) {
     this.detail = detail;
     this.game = game;
+    cards =  cards || [];
+    this.cards = cards;
     PlayingSeat.__super__.constructor.apply(this, arguments);
     this.bet = 0;
     this.state = PS_PLAY;
@@ -100,6 +108,7 @@ PlayingSeat = (function() {
     this.dom.children('.dealer').remove();
     this.dom.children('.pot').remove();
     this.reset_bet();
+    this.cards = [];
     return this.dom.removeClass('disabled');
   };
 
@@ -176,9 +185,8 @@ PlayingSeat = (function() {
   };
 
   PlayingSeat.prototype.private_card = function(face, suit, card_sn) {
-    var poker;
     this.dom.children(".draw_card").hide();
-    poker = $.get_poker(face, suit).addClass('private_card').css($.positions.get_private(this.sn, card_sn)).appendTo(this.dom);
+    var poker = $.get_poker(face, suit).addClass('private_card').css($.positions.get_private(this.sn, card_sn)).appendTo(this.dom);
     return this.pokers = this.dom.children('.card');
   };
 
@@ -199,53 +207,78 @@ PlayingSeat = (function() {
   };
 
   PlayingSeat.prototype.reset_bet = function() {
-    this.bet = 0;
-    return this.dom.children('.bet_lab').hide();
+	  this.bet = 0;
+	  return this.dom.children('.bet_lab').hide();
+  };
+  $.getCards = function(cs,suit,face) {
+	  return $.grep(cs,function(entry){
+		  if((suit == null || suit == entry.suit) && (face == null || face == entry.face)){
+			  return entry;
+		  }
+	  });
   };
 
   PlayingSeat.prototype.high = function() {
-    var f, faces, game, high, null_face, null_suit, one, pokers, s, _i, _len;
+    var f, faces, game, high, null_face, null_suit, one, pokers, s, _i, _len,all_cards,face1,face2;
     game = this.game;
     game.clear_high();
+    all_cards = game.cards.concat(this.cards);
+    
     pokers = this.pokers;
     null_suit = null;
     null_face = null;
     high = function(face, suit, filter) {
-      return game.high(face, suit, filter, pokers);
+      game.high(face, suit, filter, pokers);
     };
+    face1 = this.hand.face;
+    face2 = this.hand.face2;
     switch (this.hand.rank) {
       case HC_PAIR:
       case HC_THREE_KIND:
       case HC_FOUR_KIND:
-        high(this.hand.face);
+        high(face1);
+        var first = $.getCards(all_cards,null,face1);
+        var second = $.grep($.getCards(all_cards), function( a ) {
+			return a.face != face1;
+		}).sort($.compare_card_2);
+        return first.concat(second).slice(0,5);
         break;
       case HC_TWO_PAIR:
       case HC_FULL_HOUSE:
-        high(this.hand.face);
-        high(this.hand.face2);
+        high(face1);
+        high(face2);
+        return $.getCards(all_cards,null,face1).concat($.getCards(all_cards,null,face2)).concat(
+        		$.grep($.getCards(all_cards), function( a ) {
+        			return a.face != face1 && a.face !=face2;
+        		}).sort($.compare_card_2)
+        ).slice(0, 5);
         break;
       case HC_FLUSH:
         high(null_face, this.hand.suit, function(pokers) {
           return pokers.sort($.compare_card).slice(0, 5);
         });
-        console.log('HC_FLUSH');
+        return $.getCards(all_cards,this.hand.suit).sort($.compare_card_2).slice(0,5);
         break;
       case HC_STRAIGHT:
       case HC_STRAIGHT_FLUSH:
-        faces = [this.hand.face, this.hand.face - 1, this.hand.face - 2, this.hand.face - 3, this.hand.face === CF_FIVE ? CF_ACE : this.hand.face - 4];
+        faces = [face1, face1 - 1, face1 - 2, face1 - 3, face1 === CF_FIVE ? CF_ACE : face1 - 4];
         one = function(pokers) {
           var result;
           result = pokers.first();
           return result;
         };
         s = this.hand.rank === HC_STRAIGHT_FLUSH ? this.hand.suit : null_suit;
+        s2 = this.hand.rank === HC_STRAIGHT_FLUSH ? this.hand.suit : null;
+        var r = [];
         for (_i = 0, _len = faces.length; _i < _len; _i++) {
           f = faces[_i];
+          r.push($.getCards(all_cards,s2,f)[0]);
           high(f, s, one);
         }
-        console.log('HC_STRAIGHT or HC_STRAIGHT_FLUSH');
+        return r;
         break;
       case HC_HIGH_CARD:
+    	  return $.getCards(all_cards).sort($.compare_card_2).slice(0,5);
         break;
       default:
         throw "Unknown poker rank " + args.rank;
@@ -280,9 +313,21 @@ $(function() {
     return _results;
   };
   $.compare_card = function(a, b) {
+	  var a1, b1;
+	  a1 = new Number($(a).attr('face'));
+	  b1 = new Number($(b).attr('face'));
+	  if (a1 > b1) {
+		  return -1;
+	  } else if (a1 < b1) {
+		  return 1;
+	  } else {
+		  return 0;
+	  }
+  };
+  $.compare_card_2 = function(a, b) {
     var a1, b1;
-    a1 = new Number($(a).attr('face'));
-    b1 = new Number($(b).attr('face'));
+    a1 = new Number(a.face);
+    b1 = new Number(b.face);
     if (a1 > b1) {
       return -1;
     } else if (a1 < b1) {
