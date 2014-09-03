@@ -99,7 +99,7 @@ MAX_PLAYER = 9;
 
 CONNECTION_TIMEOUT = '15s';
 
-RANKS = ["高牌", "一对", "两对", "三条", "顺子", "同花", "葫芦", "四条", "同花顺"];
+RANKS = ["High Card", "One Pair", "Two Pair", "Three Kind", "Straigh Flush", "Flush", "Full House", "Four Kind", "Straight Flush"];
 SUITS = ['','clubs','diams','hearts','spades'];
 FACES = ['','2','3','4','5','6','7','8','9','10','J','Q','K','A'];
 

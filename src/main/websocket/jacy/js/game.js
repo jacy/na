@@ -12,16 +12,23 @@ Game = (function() {
     this.detail = detail;
     this.stage = GS_PREFLOP;
     this.seats = [];
+    this.seatData = [];
+    this.pot = new Pot();
     this.cards = [];
     return this.dom.trigger('inited');
   };
 
   Game.prototype.init_seat = function(seat_detail) {
+	this.seatData[seat_detail.sn] = new Bet(seat_detail.sn, seat_detail.bet);
     switch (seat_detail.state) {
       case PS_EMPTY:
         return this.seats[seat_detail.sn] = new EmptySeat(seat_detail, this);
       default:
-        return this.seats[seat_detail.sn] = new PlayingSeat(seat_detail, this);
+    	this.seats[seat_detail.sn] = new PlayingSeat(seat_detail, this);
+        if(seat_detail.bet > 0){
+        	this.seats[seat_detail.sn].raise(seat_detail.bet,0);
+        }
+        return this.seats[seat_detail.sn];
     }
   };
 
@@ -103,13 +110,14 @@ Game = (function() {
     var seat, _i, _len, _ref, _results;
     this.stage = GS_PREFLOP;
     this.cards = [];
+    this.pot = new Pot();
     $.positions.reset_share();
     $(".bet, .pot, .card,").remove();
-    $("#pot_0 label").text('').hide();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       seat = _ref[_i];
+      this.seatData[_i] = new Bet(_i);
       if (seat != null) _results.push(seat.clear());
     }
     return _results;
@@ -149,49 +157,83 @@ Game = (function() {
     }
   };
 
-  Game.prototype.new_stage = function(stage,pot) {
-    var ref, seat, _i, _len, _ref;
+  Game.prototype.new_stage = function(stage, pot) {
+    var _i, _len, _this, _pot, _pots ;
     this.stage = stage;
-    _ref = this.seats;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      seat = _ref[_i];
-      if ((seat != null) && seat.__proto__.constructor === PlayingSeat) {
-        seat.reset_bet();
-      }
+    _this = this;
+    _pot = _this.pot;
+    
+    for (_i = 0, _len = _this.seats.length; _i < _len; _i++) {
+    	var seat = _this.seats[_i];
+    	if ((seat != null) && seat.__proto__.constructor === PlayingSeat) {
+    		seat.reset_bet();
+    	}
     }
-    ref = this.dom;
-    return this.dom.oneTime('0.3s', function() {
-      var bet, _j, _len2, _ref2, _results;
-      _ref2 = ref.children(".bet"); // This element never got removed,,it just replace its css from bet to pot so  next time won't be selected again.
-      _results = [];
-      for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-        bet = _ref2[_j];
-        _results.push($(bet).css({top:'270px' ,left:'270px'}).removeClass('bet').addClass('pot'));
-      }
-      if(undefined != pot){
-    	  $('#pot_0 label').text(pot).show();
-      }
-      return _results;
+    
+    var Bets = [];
+    for (_i = 0, _len = _this.seatData.length; _i < _len; _i++) {
+      var sd = _this.seatData[_i];
+       Bets.push(sd);
+      _this.seatData[_i] = new Bet(_i);
+    }
+    _pot.addBets(Bets);
+    
+    _pots = _pot.pots();
+    _this.dom.oneTime('0.3s', function() {
+    	for (_i = 0, _len = _pots.length; _i < _len; _i++) {
+    		_this.animate_pot(_pots[_i],Bets);
+	    }
     });
+    _pot.new_stage();
   };
 
   Game.prototype.share_card = function(face, suit) {
-	$.push_card(this.cards,face,suit);
-    return $.get_poker(face, suit).css($.positions.get_next_share()).appendTo(this.dom);
+	  $.push_card(this.cards,face,suit);
+	  return $.get_poker(face, suit).css($.positions.get_next_share()).appendTo(this.dom);
+  };
+  
+  Game.prototype.animate_pot = function(pot, orignBets) {
+	  if(pot.total() <= 0){
+		  return;
+	  }
+	  var ref = this.dom;
+	  var _this = this;
+	  $.each(pot.members, function(i, bet){
+		  if(bet.amount > 0){
+			  var l = (270 + pot.id * 55) + 'px';
+			  var b = _this.move_to_pot(bet,orignBets[bet.seat]);
+			  b.css({top:'270px', left:l}).removeClass('bet').attr('sn', pot.id).addClass('pot');
+		  }
+	  });
+	  _this.show_pot(pot.id, pot.total());
+  };
+  
+  Game.prototype.show_pot = function(id, amount) {
+	  $('#pot_' + id +' label').text(amount).show();
+  };
+  
+  Game.prototype.move_to_pot = function(bet, originBet) {
+	  var b = this.dom.find('img.bet[sn=' + bet.seat + ']');
+	  if(bet.amount >= originBet.amount){
+		  originBet.amount = 0;
+		  return b;
+	  }else {
+		  originBet.amount = Math.floor(originBet.amount / 2);
+		  return b.slice(0, b.length/2 + 1);
+	  }
+  };
+  
+  Game.prototype.get_bet_chips = function(sn, amount) {
+	  
+	  return this.dom.find('img.bet[sn=' + bet.seat + ']');
   };
 
-  Game.prototype.win = function(seat) {
-    var ref;
-    ref = this.dom;
-    return ref.oneTime('1s', function() {
-      var bet, _i, _len, _ref, _results;
-      _ref = ref.children(".bet, .pot");
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        bet = _ref[_i];
-        _results.push($(bet).css($.positions.get_bet(seat.sn).start));
-      }
-      return _results;
+  Game.prototype.win = function(seat, potid) {
+    var ref = this.dom;
+    return ref.oneTime((potid+1)*1 + 's', function() {
+    	var p = ref.find('img.pot[sn=' + potid + ']');
+        p.css($.positions.get_bet(seat.sn).start);
+      $('#pot_' + potid +' label').text('').hide();
     });
   };
 
@@ -300,6 +342,9 @@ $(function() {
   action = function(a) {
     return "<strong class='action'>" + a + "</strong>";
   };
+  moneyAction=function(a,n){
+	  return action(a) + " " + money(n);
+  };
   rank = function(r) {
 	  return "<strong class='rank'>" + r + "</strong>";
   };
@@ -407,16 +452,25 @@ $(function() {
   $.pp.reg("SBLIND", function(args) {});
   $.pp.reg("BBLIND", function(args) {});
   $.pp.reg("BLIND", function(args) {
-    var seat;
-    seat = game.get_seat(args);
+    var seat = game.get_seat(args);
     seat.raise(args.blind, 0);
+    var sd = game.seatData[seat.sn];
+    if(args.allin == 1){
+    	sd.set_allin();
+    }
+    sd.add(args.blind);
     return log("" + (nick(seat)) + " " + (action('Blind Bet')) + " " + (money(args.blind)));
   });
   $.pp.reg("RAISE", function(args) {
 	 if(!game)return;
-    var seat, sum;
+    var seat, sum, sd;
     sum = args.call + args.raise;
     seat = game.get_seat(args);
+    sd = game.seatData[seat.sn];
+    if(args.allin == 1){
+    	sd.set_allin();
+    }
+    sd.add(sum);
     if (sum === 0) {
       seat.check();
       return log("" + (nick(seat)) + " " + (action('Checking')));
@@ -487,10 +541,19 @@ $(function() {
     return seat.private_card(args.face2, args.suit2, 2);
   });
   $.pp.reg("HAND", function(args) {
-    var seat = game.get_seat(args);
-    seat.set_hand(args);
-    seat.set_rank();
-    if (game.check_actor()) return seat.high();
+	  var seat = game.get_seat(args);
+	  seat.set_hand(args);
+	  seat.set_rank();
+	  if (game.check_actor()) return seat.high();
+  });
+  $.pp.reg("POT", function(args) {
+	  game.show_pot(args.id, args.amount);
+	  var bets = $.compute_bet_count(args.amount, []);
+	  for (_i = 0, _len = bets.length; _i < _len; _i++) {
+		  var bet = bets[_i];
+		  var l = (270 + args.id * 55) + 'px';
+		  $("<img class='pot' sn='" +  args.id + "' src='" + $.rl.img[bet] + "' />").css({top:'270px', left:l}).appendTo(game.dom);
+	  }
   });
   $.pp.reg("WIN", function(args) {
 	if(!game)return;
@@ -498,13 +561,16 @@ $(function() {
     game.disable_actions();
     game.clear_actor();
     seat = game.get_seat(args);
-    game.win(seat);
+    game.win(seat,args.potid);
     var c = seat.high();
-    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + logCard(c) + ' ' + (action('Win')) + " " + (money(args.amount - args.cost));
-    log(msg);
-    if ($(".blockUI > .buyin").size() === 0) {
-      return growlUI("<div>" + msg + "</div>");
+    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + logCard(c) + moneyAction(' Win',args.amount) + ' From Pot' + (args.potid + 1);
+    if(args.cost){
+    	msg += moneyAction(' Commission Charged',args.cost);
     }
+    log(msg);
+    //if ($(".blockUI > .buyin").size() === 0) {
+      //return growlUI("<div>" + msg + "</div>");
+    //}
   });
   $("#game > .actions > [id^=cmd_fold]").bind('click', function() {
     if (!$(this).is(':visible')) return;

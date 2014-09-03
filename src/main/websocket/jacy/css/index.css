@@ -507,5 +507,5 @@ strong.rank {
         
         }
 
-        .diams,.hearts {color: #f00 !important;font-size:12px;font-weight:bold;}
-		.spades,.clubs {color: #000 !important;font-size:12px;font-weight:bold;}
+        .diams,.hearts {color: #f00 !important;font-weight:bold;}
+		.spades,.clubs {color: #FFF !important;font-weight:bold;}
