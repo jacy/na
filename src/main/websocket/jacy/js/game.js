@@ -10,10 +10,10 @@ Game = (function() {
 
   Game.prototype.init = function(detail) {
     this.detail = detail;
-    this.stage = GS_PREFLOP;
     this.seats = [];
     this.seatData = [];
     this.pot = new Pot();
+    this.winSeq = 1;
     this.cards = [];
     return this.dom.trigger('inited');
   };
@@ -108,9 +108,10 @@ Game = (function() {
 
   Game.prototype.clear = function() {
     var seat, _i, _len, _ref, _results;
-    this.stage = GS_PREFLOP;
+    this.detail.stage = GS_PREFLOP;
     this.cards = [];
     this.pot = new Pot();
+    this.winSeq = 1;
     $.positions.reset_share();
     $(".bet, .pot, .card,").remove();
     _ref = this.seats;
@@ -157,9 +158,9 @@ Game = (function() {
     }
   };
 
-  Game.prototype.new_stage = function(stage, pot) {
+  Game.prototype.new_stage = function(stage) {
     var _i, _len, _this, _pot, _pots ;
-    this.stage = stage;
+    this.detail.stage = stage;
     _this = this;
     _pot = _this.pot;
     
@@ -200,7 +201,7 @@ Game = (function() {
 	  var _this = this;
 	  $.each(pot.members, function(i, bet){
 		  if(bet.amount > 0){
-			  var l = (270 + pot.id * 55) + 'px';
+			  var l = (270 + pot.id * 65) + 'px';
 			  var b = _this.move_to_pot(bet,orignBets[bet.seat]);
 			  b.css({top:'270px', left:l}).removeClass('bet').attr('sn', pot.id).addClass('pot');
 		  }
@@ -209,7 +210,8 @@ Game = (function() {
   };
   
   Game.prototype.show_pot = function(id, amount) {
-	  $('#pot_' + id +' label').text(amount).show();
+	  var p = $('#pot_' + id +' label');
+	  p.text(amount + (p.text() * 1)).show();
   };
   
   Game.prototype.move_to_pot = function(bet, originBet) {
@@ -230,7 +232,8 @@ Game = (function() {
 
   Game.prototype.win = function(seat, potid) {
     var ref = this.dom;
-    return ref.oneTime((potid+1)*1 + 's', function() {
+    var delay = (this.winSeq++) + 's';
+    return ref.oneTime(delay, function() {
     	var p = ref.find('img.pot[sn=' + potid + ']');
         p.css($.positions.get_bet(seat.sn).start);
       $('#pot_' + potid +' label').text('').hide();
@@ -505,7 +508,7 @@ $(function() {
     if (!game.check_actor()) return game.disable_actions();
   });
   $.pp.reg("STAGE", function(args) {
-    if (args.stage !== GS_PREFLOP) return game.new_stage(args.stage,args.pot);
+    if (args.stage !== GS_PREFLOP) return game.new_stage(args.stage);
   });
   $.pp.reg("JOIN", function(args) {
     game.join(args);
@@ -551,7 +554,7 @@ $(function() {
 	  var bets = $.compute_bet_count(args.amount, []);
 	  for (_i = 0, _len = bets.length; _i < _len; _i++) {
 		  var bet = bets[_i];
-		  var l = (270 + args.id * 55) + 'px';
+		  var l = (270 + args.id * 65) + 'px';
 		  $("<img class='pot' sn='" +  args.id + "' src='" + $.rl.img[bet] + "' />").css({top:'270px', left:l}).appendTo(game.dom);
 	  }
   });

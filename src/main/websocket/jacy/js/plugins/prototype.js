@@ -128,7 +128,6 @@
       {type: "decimal", prop: "bet"}]),
     notify_game_detail: generate_notify("GAME_DETAIL", [81,
       {type: "integer", prop: "gid"},
-      {type: "decimal", prop: "pot"},
       {type: "byte",    prop: "players"},
       {type: "byte",    prop: "seats"},
       {type: "byte",    prop: "stage"},
@@ -148,8 +147,7 @@
     ]),
     notify_stage: generate_notify("STAGE", [29,
       {type: "integer", prop: "gid"},
-      {type: "byte", prop: "stage"},
-      {type: "decimal", prop: "pot"}
+      {type: "byte", prop: "stage"}
     ]),
     notify_private: generate_notify("PRIVATE", [82,
       {type: "integer", prop: "gid"},
