@@ -47,6 +47,15 @@ var Pot = (function() {
 		this.active = [];
 	};
 	
+	Pot.prototype.get_dom = function(id, game) {
+		if($('#pot_' + id).length){
+			return $('#pot_' + id);
+		}
+		var dom = $("#game > .template > .sidepot").clone();
+		dom.attr('id','pot_' + id).css($.positions.get_pot(id));
+		return dom.appendTo(game.dom)
+	};
+	
 	Pot.prototype.pots = function() {
 		return this.active.concat(this.current);
 	};
@@ -61,14 +70,16 @@ var Pot = (function() {
 			record.addBet(bet.seat, record.allin,bet.allin);
 			unallocated -= record.allin;
 		}
-		if(bet.allin){
-			var newMembers = this.split(unallocated);
-			var newPot = this.current;
-			newPot.addBet(bet.seat, unallocated,bet.allin);
-			this.active.push(newPot);
-			this.current = new SidePot(0, newMembers,++this.id);
-		}else{
-			this.current.addBet(bet.seat,unallocated,bet.allin);
+		if(unallocated > 0){
+			if(bet.allin){
+				var newMembers = this.split(unallocated);
+				var newPot = this.current;
+				newPot.addBet(bet.seat, unallocated,bet.allin);
+				this.active.push(newPot);
+				this.current = new SidePot(0, newMembers,++this.id);
+			}else{
+				this.current.addBet(bet.seat,unallocated,bet.allin);
+			}
 		}
 	};
 	

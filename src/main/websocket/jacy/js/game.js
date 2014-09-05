@@ -114,6 +114,7 @@ Game = (function() {
     this.winSeq = 1;
     $.positions.reset_share();
     $(".bet, .pot, .card,").remove();
+    $("div[id^=pot_]").remove();
     _ref = this.seats;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -201,16 +202,15 @@ Game = (function() {
 	  var _this = this;
 	  $.each(pot.members, function(i, bet){
 		  if(bet.amount > 0){
-			  var l = (270 + pot.id * 65) + 'px';
 			  var b = _this.move_to_pot(bet,orignBets[bet.seat]);
-			  b.css({top:'270px', left:l}).removeClass('bet').attr('sn', pot.id).addClass('pot');
+			  b.css($.positions.get_pot_bet(pot.id)).removeClass('bet').attr('sn', pot.id).addClass('pot');
 		  }
 	  });
 	  _this.show_pot(pot.id, pot.total());
   };
   
   Game.prototype.show_pot = function(id, amount) {
-	  var p = $('#pot_' + id +' label');
+	  var p = this.pot.get_dom(id,this).find('label');
 	  p.text(amount + (p.text() * 1)).show();
   };
   
@@ -226,7 +226,6 @@ Game = (function() {
   };
   
   Game.prototype.get_bet_chips = function(sn, amount) {
-	  
 	  return this.dom.find('img.bet[sn=' + bet.seat + ']');
   };
 
@@ -517,7 +516,6 @@ $(function() {
   });
   $.pp.reg("LEAVE", function(args) {
     var seat = game.get_seat(args);
-    console.log("leave seat: ", seat);
     log("" + (nick(seat.player)) + " " + (action('Standup')));
     $.player.update_balance();
     return game.leave(seat);
@@ -554,8 +552,7 @@ $(function() {
 	  var bets = $.compute_bet_count(args.amount, []);
 	  for (_i = 0, _len = bets.length; _i < _len; _i++) {
 		  var bet = bets[_i];
-		  var l = (270 + args.id * 65) + 'px';
-		  $("<img class='pot' sn='" +  args.id + "' src='" + $.rl.img[bet] + "' />").css({top:'270px', left:l}).appendTo(game.dom);
+		  $("<img class='pot' sn='" +  args.id + "' src='" + $.rl.img[bet] + "' />").css($.positions.get_pot_bet(args.id)).appendTo(game.dom);
 	  }
   });
   $.pp.reg("WIN", function(args) {
@@ -566,7 +563,7 @@ $(function() {
     seat = game.get_seat(args);
     game.win(seat,args.potid);
     var c = seat.high();
-    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + logCard(c) + moneyAction(' Win',args.amount) + ' From Pot' + (args.potid + 1);
+    msg = "" + (nick(seat)) + " " + (rank(seat.rank)) + " " + logCard(c) + moneyAction(' Win',args.amount) + rank(' From Pot') + rank(args.potid + 1);
     if(args.cost){
     	msg += moneyAction(' Commission Charged',args.cost);
     }

@@ -125,6 +125,12 @@
     get_bet_lab: function(sn) {
       return get(sn).bet_lab;
     },
+    get_pot: function(sn) {
+    	return css(sn*60 + 290, 270);
+    },
+    get_pot_bet: function(sn) {
+    	return css(sn*60 + 270, 270);
+    },
     get_empty: function(sn) {
       return get(sn).empty_seat;
     },

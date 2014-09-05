@@ -362,6 +362,7 @@ strong.rank {
       height: 22px;
       font-size: 15px;
       position: absolute; }
+    #game .sidepot { position: absolute; }
   #game a.action {
     font-size: 0.8em;
     width: 70px;
