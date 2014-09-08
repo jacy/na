@@ -200,13 +200,15 @@ Game = (function() {
 	  }
 	  var ref = this.dom;
 	  var _this = this;
+	  var delta = 0;
 	  $.each(pot.members, function(i, bet){
 		  if(bet.amount > 0){
+			  delta = delta + (orignBets[bet.seat].amount * 1);
 			  var b = _this.move_to_pot(bet,orignBets[bet.seat]);
 			  b.css($.positions.get_pot_bet(pot.id)).removeClass('bet').attr('sn', pot.id).addClass('pot');
 		  }
 	  });
-	  _this.show_pot(pot.id, pot.total());
+	  _this.show_pot(pot.id, delta);
   };
   
   Game.prototype.show_pot = function(id, amount) {
@@ -531,9 +533,7 @@ $(function() {
     return $('#raise_range, #raise_number').val(args.min).attr('min', args.min).attr('max', args.max);
   });
   $.pp.reg("SHOW", function(args) {
-    var seat;
-    game.new_stage();
-    seat = game.get_seat(args);
+    var seat = game.get_seat(args);
     seat.private_card(args.face1, args.suit1, 1);
     if (args.pid != $.player.pid) {
     	$.push_card(seat.cards,args.face1,args.suit1);
