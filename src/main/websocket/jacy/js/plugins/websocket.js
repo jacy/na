@@ -7,7 +7,7 @@
 			queue.unshift(msg);
 		},
 		defaults : {
-			host : "192.168.1.10",
+			host : "localhost",
 			port : "8002",
 			onmessage : function(e) {
 				console.log([ 'websocket message', e ]);
@@ -17,6 +17,9 @@
 			},
 			onerror : function(error) {
 				console.error(['websocket catch error:',error]);
+			},
+			onclose : function() {
+				growlUI("Connection is closed by game server.");
 			}
 		},
 

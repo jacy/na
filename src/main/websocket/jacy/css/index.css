@@ -249,57 +249,34 @@ strong.rank {
       background-image: url(btn.png);
       font-size: 0.8em; }
 
-#game_list {
+.game_list {
   margin: 50px;
   width: 900px;
   height: 500px;
   -webkit-box-shadow: 1px 3px 3px black;
   border: 2px solid black;
+  border-spacing: 0px;
   background-color: #d0d2d3;
   position: absolute;
   font-size: 16px; }
-  #game_list th {
+  .game_list th {
     background: -webkit-gradient(linear, left top, left bottom, from(#e8e8ee), to(#bdbfc2));
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid black; }
-  #game_list tr {
+  .game_list tr {
     height: 22px; }
-  #game_list td {
+  .game_list td {
     padding: 5px 0px 5px 0px;
     text-align: center; }
-  #game_list .autofill {
+  .game_list .autofill {
     height: auto; }
-  #game_list .col_longest {
+  .game_list .col_longest {
     width: 150px; }
-  #game_list .col_short {
+  .game_list .col_short {
     width: 90px; }
-  #game_list .selected {
+  .game_list .selected {
     background-color: #bab1c6 !important; }
-
-/* GAME PREVIEW */
-#game_preview {
-  top: 20px;
-  left: 172px;
-  width: 650px;
-  height: 310px;
-  background: url(table.png) no-repeat center;
-  position: absolute; }
-  #game_preview .seat {
-    width: 60px;
-    height: 88px;
-    border: 0px;
-    margin: 0px;
-    padding: 0px;
-    position: absolute;
-    font-size: 16px; }
-    #game_preview .seat > .photo {
-      width: 60px;
-      height: 60px;
-      -webkit-box-shadow: 1px 3px 3px black; }
-    #game_preview .seat > .inplay, #game_preview .seat .nick {
-      color: white;
-      text-align: center; }
 
 #game {
   display: none;
